@@ -7,6 +7,7 @@ from langchain.chains import RetrievalQA
 from datetime import date
 from dotenv import dotenv_values
 from preprocess import Preprocessor
+
 #Fetch env vars
 env_vars = dotenv_values('.env')
 
@@ -50,12 +51,12 @@ if __name__ == "__main__":
         "my department" : "DEVOPS",
         "my email" : 'pawargaurang1212@gmail.com'
     }
-    #qa({"query" : "This is some extra user data {}. TePlease remember this".format(str(metadata))})
+    
     while query != "kill":
         #Add some metadata with current query
         query = pprocessor.process_pronouns(query=query)
         query = pprocessor.process_time(query=query)
-        print(query)
+        query = query + "Extra context : {}".format(metadata)
         response = qa({"query" : query})
         print(response['result'] + "\n")
         query = input("enter query >> ")
