@@ -1,6 +1,5 @@
 from langchain.embeddings import OpenAIEmbeddings
 from jira_service import Jira_service
-
 from langchain.vectorstores import Pinecone
 import pinecone
 from langchain.chat_models import ChatOpenAI
@@ -27,7 +26,7 @@ if __name__ == "__main__":
     vectorstore = Pinecone(index, embeddings.embed_query, "text")
 
     docsearch = Pinecone.from_existing_index(index_name="jira", embedding=embeddings)
-    chat = ChatOpenAI(verbose=True, temperature=0.8, openai_api_key=openai_key)
+    chat = ChatOpenAI(verbose=True, temperature=0.8, max_tokens=500, openai_api_key=openai_key)
     qa = RetrievalQA.from_chain_type(llm=chat, chain_type="stuff", retriever=docsearch.as_retriever(), return_source_documents=True)
 
     """vectorstore.delete(delete_all=True)
@@ -40,7 +39,7 @@ if __name__ == "__main__":
     )
 
     query = input("enter query >> ")
-    team_members = ["gaurang pawar", "nishit jain"]
+    
     metadata = {
         "today" : date.today(),
         "my name" : "gaurang  pawar",
@@ -52,7 +51,9 @@ if __name__ == "__main__":
     qa({"query" : "This is some extra user data {}. Team_members {}. Please remember this".format(str(metadata), str(team_members))})
     while query != "kill":
         #Add some metadata with current query
-        query = pprocessor.process_pronouns(query=query) 
+        query = pprocessor.process_pronouns(query=query)
+        query = pprocessor.process_time(query=query)
+        print(query)
         response = qa({"query" : query})
         print(response['result'] + "\n")
         query = input("enter query >> ")

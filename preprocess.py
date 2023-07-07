@@ -1,3 +1,4 @@
+from datetime import date
 
 
 class Preprocessor:
@@ -19,6 +20,20 @@ class Preprocessor:
                 query[i] = query[i] + "({})".format(self.name)
             
 
-        return "".join(query)   
+        return " ".join(query)   
 
+    def process_time(self, query):
+
+        today = date.today()
+        query = query.split(" ")
+
+        for i in range(len(query)):
             
+            word = query[i].lower()
+
+            if word == "today" or word == "todays":
+                query[i] = query[i] + "({})".format(str(today))
+            
+
+        return " ".join(query)   
+
