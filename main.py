@@ -26,12 +26,14 @@ if __name__ == "__main__":
     vectorstore = Pinecone(index, embeddings.embed_query, "text")
 
     docsearch = Pinecone.from_existing_index(index_name="jira", embedding=embeddings)
-    chat = ChatOpenAI(verbose=True, temperature=0.8, max_tokens=500, openai_api_key=openai_key)
+    chat = ChatOpenAI(verbose=True, temperature=0.8, max_tokens=200, openai_api_key=openai_key)
     qa = RetrievalQA.from_chain_type(llm=chat, chain_type="stuff", retriever=docsearch.as_retriever(), return_source_documents=True)
 
-    """vectorstore.delete(delete_all=True)
-    jira.add_by_project_id(vectorstore, "DV")
-    jira.add_by_project_id(vectorstore, "DEV")"""
+    
+    #Clear all vectors and re-ingest all data
+    #vectorstore.delete(delete_all=True)
+    #jira.add_by_project_id(vectorstore, "DV")
+    #jira.add_by_project_id(vectorstore, "DEV")
 
     #Initialize query processor
     pprocessor = Preprocessor(
@@ -48,7 +50,7 @@ if __name__ == "__main__":
         "my department" : "DEVOPS",
         "my email" : 'pawargaurang1212@gmail.com'
     }
-    qa({"query" : "This is some extra user data {}. Team_members {}. Please remember this".format(str(metadata), str(team_members))})
+    #qa({"query" : "This is some extra user data {}. TePlease remember this".format(str(metadata))})
     while query != "kill":
         #Add some metadata with current query
         query = pprocessor.process_pronouns(query=query)

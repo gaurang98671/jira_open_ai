@@ -31,7 +31,7 @@ class Preprocessor:
             
             word = query[i].lower()
 
-            if word == "today" or word == "todays":
+            if "today" in word or "todays" in word:
                 query[i] = query[i] + "({})".format(str(today))
             
 

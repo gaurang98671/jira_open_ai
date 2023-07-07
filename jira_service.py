@@ -9,7 +9,7 @@ class Jira_service:
         self.email = email
         self.headers = {'Content-Type' : 'application/json;charset=iso-8859-1'}
         self.base_url = "https://deeeznuts.atlassian.net/rest/api/2/"
-        self.auth = HTTPBasicAuth(self.email, self.token)
+        self.auth = HTTPBasicAuth(email, token)
 
     def fetch(self, url):
         response = requests.get(url, headers=self.headers, auth=self.auth)
@@ -34,6 +34,7 @@ class Jira_service:
         linked_issues = response["fields"]["issuelinks"]
         assignee = response["fields"]["assignee"]
         created_on = response["fields"]["created"]
+        ticket_logs = self.get_ticket_logs(jira_id)
 
         data = {
         'Issue Id' : jira_id,
@@ -50,7 +51,8 @@ class Jira_service:
         'Linked issues' : linked_issues,
         'Assigned to' : assignee,
         'Created_on' : created_on,
-        'Record type' : "jira"
+        'Record type' : "jira",
+        'Ticket logs' : ticket_logs
         }
 
         return data
@@ -60,11 +62,27 @@ class Jira_service:
     def get_all_issues(self, project_key):
         
         url = self.base_url + "search?jql=project=" + project_key
+        
         response = self.fetch(url)
+
         issues = [x["key"] for x in response["issues"]]
         
         return issues
+    
+    def get_ticket_logs(self, jira_id):
+        
+        url = "{}issue/{}/changelog".format(self.base_url, jira_id)
+        response = self.fetch(url)
+        logs = []
 
+        for i in response['values']:
+            auth_name = i['author']['displayName']
+            created_date = i['created'].split("T")[0]        
+            for change in i['items']:
+                logs.append("User {} changed {} from {} to {} on {}".format(auth_name, change['field'], change['from'], change['toString'], created_date))
+
+        return logs
+    
     def add_to_db(self, vectorstore, data):
         vectorstore.add_texts(data)
 
