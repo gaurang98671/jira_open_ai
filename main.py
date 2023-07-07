@@ -7,7 +7,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
 from datetime import date
 from dotenv import dotenv_values
-
+from preprocess import Preprocessor
 #Fetch env vars
 env_vars = dotenv_values('.env')
 
@@ -34,7 +34,13 @@ if __name__ == "__main__":
     jira.add_by_project_id(vectorstore, "DV")
     jira.add_by_project_id(vectorstore, "DEV")"""
 
+    #Initialize query processor
+    pprocessor = Preprocessor(
+        name= "Gaurang Pawar"
+    )
+
     query = input("enter query >> ")
+    team_members = ["gaurang pawar", "nishit jain"]
     metadata = {
         "today" : date.today(),
         "my name" : "gaurang  pawar",
@@ -43,10 +49,10 @@ if __name__ == "__main__":
         "my department" : "DEVOPS",
         "my email" : 'pawargaurang1212@gmail.com'
     }
+    qa({"query" : "This is some extra user data {}. Team_members {}. Please remember this".format(str(metadata), str(team_members))})
     while query != "kill":
         #Add some metadata with current query
-        query = query + "This is some extra user data"+str(metadata)
+        query = pprocessor.process_pronouns(query=query) 
         response = qa({"query" : query})
         print(response['result'] + "\n")
         query = input("enter query >> ")
-    

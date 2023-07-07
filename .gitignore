@@ -2,3 +2,6 @@ Scripts
 Include
 Lib
 .env
+pyvenv.cfg
+__pycache__
+pyenv.cfg
